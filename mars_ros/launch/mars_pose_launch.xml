@@ -1,0 +1,38 @@
+<launch>
+    <!-- Input -->
+    <arg name="imu_in_topic" default="imu_in" />
+    <arg name="transform_in_topic" default="transform_in" />
+    <arg name="pose_in_topic" default="pose_in" />
+    <arg name="pose_with_cov_in_topic" default="pose_with_cov_in" />
+    <arg name="odom_in_topic" default="odom_in" />
+
+    <!-- Output Core State -->
+    <arg name="full_state_out_topic" default="full_state_out" />
+    <arg name="full_state_lite_out_topic" default="full_state_lite_out" />
+    <arg name="pose_state_out_topic" default="pose_state_out" />
+
+    <!-- Output Calibration State -->
+    <arg name="pose_cal_state_out_topic" default="pose_cal_state_out" />
+
+    <!-- Launching the mars_ros pose_node -->
+    <node name="mars_pose_node" pkg="mars_ros2" exec="pose_node" output="screen">
+        <param from="$(find-pkg-share mars_ros2)/launch/config/pose_config.yaml" />
+
+        <!-- Input -->
+        <remap from="imu_in" to="$(var imu_in_topic)" />
+        <remap from="transform_in" to="$(var transform_in_topic)" />
+        <remap from="pose_in" to="$(var pose_in_topic)" />
+        <remap from="pose_with_cov_in" to="$(var pose_with_cov_in_topic)" />
+        <remap from="odom_in" to="$(var odom_in_topic)" />
+
+        <!-- Output Core State -->
+        <remap from="core_ext_state_out" to="$(var full_state_out_topic)" />
+        <remap from="core_ext_state_lite_out" to="$(var full_state_lite_out_topic)" />
+        <remap from="core_pose_state_out" to="$(var pose_state_out_topic)" />
+
+        <!-- Output Calibration State -->
+        <remap from="pose_cal_state_out" to="$(var pose_cal_state_out_topic)" />
+    </node>
+
+</launch>
+  

@@ -1,0 +1,3 @@
+[submodule "mars_ros/mars_lib"]
+	path = mars_ros/mars_lib
+	url = https://github.com/aau-cns/mars_lib.git
