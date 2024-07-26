@@ -1,0 +1,71 @@
+# Copyright (C) 2022-2024 Martin Scheiber and Christian Brommer,
+# Control of Networked Systems, University of Klagenfurt, Austria.
+#
+# All rights reserved.
+#
+# This software is licensed under the terms of the BSD-2-Clause-License with
+# no commercial use allowed, the full terms of which are made available
+# in the LICENSE file. No license in patents is granted.
+#
+# You can contact the author at <martin.scheiber@ieee.org> and
+# <christian.brommer@ieee.org>.
+
+name: ROS
+
+on:
+  push:
+    branches: [ "main", "development" ]
+  pull_request:
+    branches: [ "main", "development" ]
+
+jobs:
+  ros_ci:
+    name: ROS ${{ matrix.ROS_DISTRO }}
+    runs-on: ubuntu-22.04
+    container: ros:${{ matrix.ROS_DISTRO }}-ros-base
+    strategy:
+      # fail-fast needs to be false to perform all matrix checks, even if one fails
+      fail-fast: true
+      matrix:
+        ROS_DISTRO: [humble, iron]
+    env:
+      BADGE_CREATION: false #${{ github.event_name == 'push' && github.repository_owner == 'aau-cns' }}
+    steps:
+
+    - name: Get newest Git version
+      run: >
+           apt update && apt install --no-install-recommends -y
+           software-properties-common
+           && add-apt-repository ppa:git-core/ppa
+
+    - name: Install Dependencies
+      run: >
+           apt update && apt install --no-install-recommends -y
+           git
+           build-essential
+           g++
+           clang
+           clang-tidy
+           cmake
+           python3-pip
+           libgtest-dev
+           doxygen
+           graphviz    
+
+    - name: Create Ros2 Workspace
+      run: mkdir -p ${{github.workspace}}/ros_ws/src
+
+    - name: Checkout Latest Version
+      uses: actions/checkout@v4
+      with:
+        path: ${{github.workspace}}/ros_ws/src
+        submodules: recursive
+
+    - name: Build Debug
+      working-directory: ${{github.workspace}}/ros_ws
+      run: /bin/bash -c 'pwd; source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash; colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug --event-handlers console_cohesion+ --cmake-args -DCMAKE_VERBOSE_MAKEFILE=ON'
+
+    - name: Build Release
+      working-directory: ${{github.workspace}}/ros_ws
+      run: /bin/bash -c 'source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash; colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release'
+

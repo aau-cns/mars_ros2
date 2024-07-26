@@ -1,5 +1,4 @@
 FROM ros:humble-ros-base
-# Install the xz-utils package
 
 # Set the timezone to UTC
 ENV TZ=UTC
