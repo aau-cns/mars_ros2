@@ -2,7 +2,7 @@
 
 # Introduction
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5185909.svg)](https://doi.org/10.5281/zenodo.5185909) [![IEEE](https://img.shields.io/badge/IEEE-10.1109/LRA.2020.3043195-00498d.svg)](https://ieeexplore.ieee.org/document/9286578) [![License](https://img.shields.io/badge/License-AAUCNS-green.svg)](./LICENSE)
+[![ROS2 Build](https://github.com/aau-cns/mars_ros2/actions/workflows/ros.yml/badge.svg)](https://github.com/aau-cns/mars_ros2/actions/workflows/ros.yml/badge.svg)[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5185909.svg)](https://doi.org/10.5281/zenodo.5185909) [![IEEE](https://img.shields.io/badge/IEEE-10.1109/LRA.2020.3043195-00498d.svg)](https://ieeexplore.ieee.org/document/9286578) [![License](https://img.shields.io/badge/License-AAUCNS-green.svg)](./LICENSE)
 
 This package is a ROS2 Wrapper for the Modular and Robust State-Estimation (MaRS) Library, which can be found [here](https://github.com/aau-cns/mars_lib), with the technology described by this [publication](https://ieeexplore.ieee.org/document/9286578). The wrapper defines simple nodes for direct use. Additional sensors can be added to pre-existing nodes, or a dedicated ROS node can be designed for a specific application.
 
@@ -18,9 +18,8 @@ The MaRS ROS wrapper uses the MaRS library as a submodule. After cloning the `ma
 
 ### ROS2 Wrapper
 
-- Ready to use ROS nodes for common setups (Position, Pose, and GNSS sensor with IMU)
+- Ready to use ROS nodes for common setups (currently Pose with IMU)
 - Predefined sensor update modules (Plug and Play)
-- Predefined RQT views
 - Docker test environment
 
 ### The MaRS Framework
@@ -39,21 +38,18 @@ The MaRS ROS wrapper uses the MaRS library as a submodule. After cloning the `ma
 ## Setup and Building the Project
 
 ```sh
-# Generate a catkin workspace (optional)
-$ mkdir -p catkin_ws/src
-$ cd catkin_ws
-$ catkin init
-$ catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
-$ cd src
+# Prepare the ros workspace
+$ mkdir -p ros_ws/src
+$ cd ros_ws
 
-# Get the mars_ros package
-$ git clone https://github.com/aau-cns/mars_ros.git mars_ros
-$ cd mars_ros
+# Get the mars_ros2 package
+$ git clone https://github.com/aau-cns/mars_ros2.git mars_ros2
+$ cd mars_ros2
 $ git submodule update --init --recursive
 
 # Build the project and run tests
 $ cd ../../
-$ catkin build
+$ colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
 ## Isolated Build with Docker
@@ -62,8 +58,8 @@ The docker image is published regularly with updates to [Dockerhub](https://hub.
 If you want to build the image yourself, you can do so with
 
 ```sh
-$ cd mars_ros # Enter the source directory
-$ docker build --network=host -t aaucns/mars_ros_test_env:latest . # Build the Docker image
+$ cd mars_ros2/.devcontainer # Enter the source directory
+$ docker build --network=host -t aaucns/mars_ros2_test_env:latest . # Build the Docker image
 ```
 
 Either way, you can then test your MaRS ROS wrapper by executing the following.
@@ -74,7 +70,7 @@ Either way, you can then test your MaRS ROS wrapper by executing the following.
 $ docker run -it --rm \
   --network=host \
   -v "$(pwd)":/source:ro \
-  aaucns/mars_ros_test_env:latest
+  aaucns/mars_ros2_test_env:latest
 ```
 
 # Usage
@@ -83,9 +79,7 @@ $ docker run -it --rm \
 
 | Module Name   | Description                                 |
 | ------------- | ------------------------------------------- |
-| position_node | An example 3DoF position update node        |
 | pose_node     | An example 6DoF pose update node            |
-| gps_node      | An example 3DoF GNSS coordinate update node |
 
 ## Parameter
 
@@ -197,55 +191,45 @@ Generated with `tree -a -L 3 --noreport --charset unicode > layout.md`
 
 ```
 .
-|-- cfg
-|   `-- mars.cfg
-|-- .clang-format
-|-- cmake
-|   `-- mars_libConfig.cmake
-|-- CMakeLists.txt
-|-- docker
-|   |-- docker_application_test.sh
-|   `-- dockerfile
-|-- .gitmodules
-|-- include
-|   |-- mars_msg_conv.h
-|   |-- mars_wrapper_gps.h
-|   |-- mars_wrapper_pose.h
-|   `-- mars_wrapper_position.h
-|-- launch
-|   |-- config
-|   |   |-- gps_config.yaml
-|   |   |-- pose_config.yaml
-|   |   `-- position_config.yaml
-|   |-- mars_gps.launch
-|   |-- mars_gps_template.launch
-|   |-- mars_pose.launch
-|   |-- mars_pose_template.launch
-|   |-- mars_position.launch
-|   |-- px4_sim.launch
-|   `-- rqt_pose.launch
+|-- .devcontainer
+|   |-- devcontainer.json
+|   `-- Dockerfile
+|-- .github
+|   `-- workflows
+|       `-- ros.yml
 |-- LICENSE
-|-- mars_lib
-|       `-- <submodule>
-|-- msg
-|   |-- ExtCoreStateLite.msg
-|   `-- ExtCoreState.msg
-|-- package.xml
+|-- mars_msgs
+|   |-- CMakeLists.txt
+|   |-- msg
+|   |   |-- ExtCoreStateLite.msg
+|   |   |-- ExtCoreState.msg
+|   |   `-- VisionSensorState.msg
+|   `-- package.xml
+|-- mars_ros
+|   |-- .clang-format
+|   |-- cmake
+|   |   `-- mars_libConfig.cmake
+|   |-- CMakeLists.txt
+|   |-- include
+|   |   |-- mars_msg_conv.h
+|   |   |-- mars_pose_paramloader.h
+|   |   `-- mars_wrapper_pose.h
+|   |-- launch
+|   |   |-- config
+|   |   `-- mars_pose_launch.xml
+|   |-- mars_lib
+|   |   `-- <submodule>
+|   |-- package.xml
+|   `-- src
+|       |-- mars_node.cpp
+|       `-- mars_wrapper_pose.cpp
 |-- README.md
 |-- resources
-|   |-- a-astro-space-font.zip
-|   |-- cov_segmentation.png
-|   |-- cov_segmentation.svg
-|   |-- mars_ros_logo.png
-|   `-- mars_ros_logo.svg
-|-- rosdoc.yaml
-|-- rqt_perspective
-|   `-- mars_pose.perspective
-`-- src
-    |-- mars_node.cpp
-    |-- mars_wrapper_gps.cpp
-    |-- mars_wrapper_pose.cpp
-    `-- mars_wrapper_position.cpp
+   |-- a-astro-space-font.zip
+   |-- mars_ros2_logo.png
+   |-- mars_ros2_logo.svg
+    `-- mars_ros_logo.svg
+
 ```
 
 # Contact
