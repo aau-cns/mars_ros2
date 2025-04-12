@@ -1,0 +1,46 @@
+<launch>
+    <!-- Input -->
+    <arg name="imu_in_topic" default="imu_in" />
+    <arg name="transform1_in_topic" default="transform1_in" />
+    <arg name="pose1_in_topic" default="pose1_in" />
+    <arg name="pose1_with_cov_in_topic" default="pose1_with_cov_in" />
+    <arg name="odom1_in_topic" default="odom1_in" />
+    <arg name="transform2_in_topic" default="transform2_in" />
+    <arg name="pose2_in_topic" default="pose2_in" />
+    <arg name="pose2_with_cov_in_topic" default="pose2_with_cov_in" />
+    <arg name="odom2_in_topic" default="odom2_in" />
+
+    <!-- Output Core State -->
+    <arg name="full_state_out_topic" default="full_state_out" />
+    <arg name="full_state_lite_out_topic" default="full_state_lite_out" />
+    <arg name="pose_state_out_topic" default="pose_state_out" />
+
+    <!-- Output Calibration State -->
+    <arg name="pose1_cal_state_out_topic" default="pose1_cal_state_out" />
+    <arg name="pose2_cal_state_out_topic" default="pose2_cal_state_out" />
+
+    <!-- Launching the mars_ros pose_node -->
+    <node name="mars_pose_node" pkg="mars_ros2" exec="dualpose_node" output="screen">
+        <param from="$(find-pkg-share mars_ros2)/launch/config/dualpose_config.yaml" />
+
+        <!-- Input -->
+        <remap from="imu_in" to="$(var imu_in_topic)" />
+        <remap from="transform1_in" to="$(var transform1_in_topic)" />
+        <remap from="pose1_in" to="$(var pose1_in_topic)" />
+        <remap from="pose1_with_cov_in" to="$(var pose1_with_cov_in_topic)" />
+        <remap from="odom1_in" to="$(var odom1_in_topic)" />
+        <remap from="transform2_in" to="$(var transform2_in_topic)" />
+        <remap from="pose2_in" to="$(var pose2_in_topic)" />
+        <remap from="pose2_with_cov_in" to="$(var pose2_with_cov_in_topic)" />
+        <remap from="odom2_in" to="$(var odom2_in_topic)" />
+
+        <!-- Output Core State -->
+        <remap from="core_ext_state_out" to="$(var full_state_out_topic)" />
+        <remap from="core_ext_state_lite_out" to="$(var full_state_lite_out_topic)" />
+        <remap from="core_pose_state_out" to="$(var pose_state_out_topic)" />
+
+        <!-- Output Calibration State -->
+        <remap from="pose1_cal_state_out" to="$(var pose1_cal_state_out_topic)" />
+        <remap from="pose2_cal_state_out" to="$(var pose2_cal_state_out_topic)" />
+    </node>
+</launch>

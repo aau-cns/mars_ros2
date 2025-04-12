@@ -1,4 +1,4 @@
-pose_node:
+mars_pose_node:
   ros__parameters:
     # NOTE: Do not use 1e-6 format because this is recognized as a string
     # Framework Settings
