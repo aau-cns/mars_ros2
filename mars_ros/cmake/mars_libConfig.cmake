@@ -29,6 +29,5 @@ ${CMAKE_CURRENT_SOURCE_DIR}/mars_lib/source/mars/include
 ${CMAKE_CURRENT_BINARY_DIR}/mars_lib/src/mars_lib-ext-build/boost/include
 ${CMAKE_CURRENT_BINARY_DIR}/mars_lib/src/mars_lib-ext-build/Eigen/include/eigen3
 )
-
-set(MARS_LIBRARY ${CMAKE_BINARY_DIR}/mars_lib/lib/libmars.a
-)
+set(MARS_LIBRARY_RELEASE ${CMAKE_BINARY_DIR}/mars_lib/lib/libmars.a)
+set(MARS_LIBRARY_DEBUG ${CMAKE_BINARY_DIR}/mars_lib/lib/libmarsd.a)
