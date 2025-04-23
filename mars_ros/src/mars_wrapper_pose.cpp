@@ -82,7 +82,6 @@ MarsWrapperPose::MarsWrapperPose() : Node("mars_ros_node"), m_sett_(this) {
     {
         pub_core_path_ = this->create_publisher<nav_msgs::msg::Path>("core_states_path", m_sett_.pub_cb_buffer_size_);
     }
-  
 }
 
 
@@ -108,7 +107,7 @@ void MarsWrapperPose::ImuMeasurementCallback(const sensor_msgs::msg::Imu::ConstP
     const bool valid_update = core_logic_.ProcessMeasurement(imu_sensor_sptr_, timestamp, data);
 
     // Initialize the first time at which the propagation sensor occures
-    if (!core_logic_.core_is_initialized_)
+    if (!core_logic_.core_is_initialized_ && do_state_init_)
     {
         core_logic_.Initialize(p_wi_init_, q_wi_init_);
     }

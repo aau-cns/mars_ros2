@@ -45,11 +45,25 @@ geometry_msgs
 nav_msgs
 mars_msgs
 )
-
 target_link_libraries(pose_node ${MARS_LIBRARY})
+set_property(TARGET pose_node PROPERTY COMPILE_DEFINITIONS POSE)
+
+add_executable(dualpose_node src/mars_node.cpp src/mars_wrapper_dualpose.cpp)
+add_dependencies(dualpose_node mars_lib)
+ament_target_dependencies(dualpose_node
+rclcpp
+std_msgs
+sensor_msgs
+geometry_msgs
+nav_msgs
+mars_msgs
+)
+target_link_libraries(dualpose_node ${MARS_LIBRARY})
+set_property(TARGET dualpose_node PROPERTY COMPILE_DEFINITIONS DUALPOSE)
 
 install(TARGETS
   pose_node
+  dualpose_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
