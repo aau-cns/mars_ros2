@@ -10,15 +10,28 @@
 // You can contact the author at <christian.brommer@ieee.org>
 
 #include "rclcpp/rclcpp.hpp"
+
+#ifdef POSE
 #include "mars_wrapper_pose.h"
+#endif
+#ifdef DUALPOSE
+#include "mars_wrapper_dualpose.h"
+#endif
 
 int main(int argc, char* argv[])
 {
   rclcpp::init(argc, argv);
+
+  #ifdef POSE
   auto node = std::make_shared<MarsWrapperPose>();
   RCLCPP_INFO(node->get_logger(), "Starting the MaRS Framework");
-
   rclcpp::spin(node);
+  #endif
+  #ifdef DUALPOSE
+  auto node = std::make_shared<MarsWrapperDualPose>();
+  RCLCPP_INFO(node->get_logger(), "Starting the MaRS Framework");
+  rclcpp::spin(node);
+  #endif
 
   rclcpp::shutdown();
   return 0;

@@ -52,6 +52,14 @@ public:
   Eigen::Quaterniond pose1_cal_q_ip_;
   Eigen::Matrix<double, 6, 1> pose1_state_init_cov_;
 
+  Eigen::Vector3d pose2_pos_meas_noise_;
+  Eigen::Vector3d pose2_rot_meas_noise_;
+  bool pose2_use_dyn_meas_noise_{ false };
+  Eigen::Vector3d pose2_cal_p_ip_;
+  Eigen::Quaterniond pose2_cal_q_ip_;
+  Eigen::Matrix<double, 6, 1> pose2_state_init_cov_;
+
+
   void check_size(const int& size_in, const int& size_comp)
   {
     if (size_comp != size_in)
@@ -95,6 +103,12 @@ public:
     node->declare_parameter("pose1_cal_p_ip", std::vector<double>{ 0.0, 0.0, 0.0 });
     node->declare_parameter("pose1_cal_q_ip", std::vector<double>{ 1.0, 0.0, 0.0, 0.0 });
     node->declare_parameter("pose1_state_init_cov", std::vector<double>{ 0.01, 0.01, 0.01, 0.03, 0.03, 0.03 });
+
+    node->declare_parameter("pose2_pos_meas_noise", std::vector<double>{ 0.1, 0.1, 0.1 });
+    node->declare_parameter("pose2_rot_meas_noise", std::vector<double>{ 0.03, 0.03, 0.03 });
+    node->declare_parameter("pose2_cal_p_ip", std::vector<double>{ 0.0, 0.0, 0.0 });
+    node->declare_parameter("pose2_cal_q_ip", std::vector<double>{ 1.0, 0.0, 0.0, 0.0 });
+    node->declare_parameter("pose2_state_init_cov", std::vector<double>{ 0.01, 0.01, 0.01, 0.03, 0.03, 0.03 });
 
     publish_on_propagation_ = node->get_parameter("pub_on_prop").as_bool();
    
@@ -155,6 +169,24 @@ public:
     pose1_cal_p_ip_ = Eigen::Map<Eigen::Matrix<double, 3, 1> >(pose1_cal_p_ip.data());
     pose1_cal_q_ip_ = Eigen::Quaterniond(pose1_cal_q_ip[0], pose1_cal_q_ip[1], pose1_cal_q_ip[2], pose1_cal_q_ip[3]);
     pose1_state_init_cov_ = Eigen::Map<Eigen::Matrix<double, 6, 1> >(pose1_state_init_cov.data());
+
+    std::vector<double> pose2_pos_meas_noise = node->get_parameter("pose2_pos_meas_noise").as_double_array();
+    std::vector<double> pose2_rot_meas_noise = node->get_parameter("pose2_rot_meas_noise").as_double_array();
+    std::vector<double> pose2_cal_p_ip = node->get_parameter("pose2_cal_p_ip").as_double_array();
+    std::vector<double> pose2_cal_q_ip = node->get_parameter("pose2_cal_q_ip").as_double_array();
+    std::vector<double> pose2_state_init_cov = node->get_parameter("pose2_state_init_cov").as_double_array();
+
+    check_size(pose1_pos_meas_noise.size(), 3);
+    check_size(pose1_rot_meas_noise.size(), 3);
+    check_size(pose1_cal_p_ip.size(), 3);
+    check_size(pose1_cal_q_ip.size(), 4);
+    check_size(pose1_state_init_cov.size(), 6);
+
+    pose2_pos_meas_noise_ = Eigen::Map<Eigen::Matrix<double, 3, 1> >(pose2_pos_meas_noise.data());
+    pose2_rot_meas_noise_ = Eigen::Map<Eigen::Matrix<double, 3, 1> >(pose2_rot_meas_noise.data());
+    pose2_cal_p_ip_ = Eigen::Map<Eigen::Matrix<double, 3, 1> >(pose2_cal_p_ip.data());
+    pose2_cal_q_ip_ = Eigen::Quaterniond(pose2_cal_q_ip[0], pose2_cal_q_ip[1], pose2_cal_q_ip[2], pose2_cal_q_ip[3]);
+    pose2_state_init_cov_ = Eigen::Map<Eigen::Matrix<double, 6, 1> >(pose2_state_init_cov.data());
   }
 };
 

@@ -82,7 +82,6 @@ MarsWrapperPose::MarsWrapperPose() : Node("mars_ros_node"), m_sett_(this) {
     {
         pub_core_path_ = this->create_publisher<nav_msgs::msg::Path>("core_states_path", m_sett_.pub_cb_buffer_size_);
     }
-  
 }
 
 
@@ -102,13 +101,13 @@ void MarsWrapperPose::ImuMeasurementCallback(const sensor_msgs::msg::Imu::ConstP
 
     // Generate a measurement data block
     mars::BufferDataType data;
-    data.set_sensor_data(std::make_shared<mars::IMUMeasurementType>(MarsMsgConv::ImuMsgToImuMeas(*meas)));
+    data.set_measurement(std::make_shared<mars::IMUMeasurementType>(MarsMsgConv::ImuMsgToImuMeas(*meas)));
 
     // Call process measurement
     const bool valid_update = core_logic_.ProcessMeasurement(imu_sensor_sptr_, timestamp, data);
 
     // Initialize the first time at which the propagation sensor occures
-    if (!core_logic_.core_is_initialized_)
+    if (!core_logic_.core_is_initialized_ && do_state_init_)
     {
         core_logic_.Initialize(p_wi_init_, q_wi_init_);
     }
@@ -149,11 +148,11 @@ void MarsWrapperPose::RunCoreStatePublisher()
         return;
     }
     
-    mars::CoreStateType latest_core_state = static_cast<mars::CoreType*>(latest_state.data_.core_.get())->state_;
+    mars::CoreStateType latest_core_state = static_cast<mars::CoreType*>(latest_state.data_.core_state_.get())->state_;
 
     if (m_sett_.pub_cov_)
     {
-        mars::CoreStateMatrix cov = static_cast<mars::CoreType*>(latest_state.data_.core_.get())->cov_;
+        mars::CoreStateMatrix cov = static_cast<mars::CoreType*>(latest_state.data_.core_state_.get())->cov_;
         pub_ext_core_state_->publish(
             MarsMsgConv::ExtCoreStateToMsgCov(latest_state.timestamp_.get_seconds(), latest_core_state, cov));
     }
@@ -205,7 +204,7 @@ void MarsWrapperPose::PoseMeasurementUpdate(std::shared_ptr<mars::PoseSensorClas
 
     // Generate a measurement data block
     mars::BufferDataType data;
-    data.set_sensor_data(std::make_shared<mars::PoseMeasurementType>(pose_meas));
+    data.set_measurement(std::make_shared<mars::PoseMeasurementType>(pose_meas));
 
     // Call process measurement
     if (!core_logic_.ProcessMeasurement(sensor_sptr, timestamp_corr, data))
@@ -225,7 +224,7 @@ void MarsWrapperPose::PoseMeasurementUpdate(std::shared_ptr<mars::PoseSensorClas
         return;
     }
 
-    mars::PoseSensorStateType pose_sensor_state = sensor_sptr.get()->get_state(latest_result.data_.sensor_);
+    mars::PoseSensorStateType pose_sensor_state = sensor_sptr.get()->get_state(latest_result.data_.sensor_state_);
 
     pub_pose1_state_->publish(MarsMsgConv::PoseStateToPoseMsg(latest_result.timestamp_.get_seconds(), pose_sensor_state));
 }

@@ -20,7 +20,7 @@ on:
 
 jobs:
   ros_ci:
-    name: ROS ${{ matrix.ROS_DISTRO }}
+    name: Build ROS ${{ matrix.build_type }} (${{ matrix.ROS_DISTRO }})
     runs-on: ubuntu-22.04
     container: ros:${{ matrix.ROS_DISTRO }}-ros-base
     strategy:
@@ -28,6 +28,7 @@ jobs:
       fail-fast: true
       matrix:
         ROS_DISTRO: [humble, iron]
+        build_type: [Debug, Release]
     env:
       BADGE_CREATION: false #${{ github.event_name == 'push' && github.repository_owner == 'aau-cns' }}
     steps:
@@ -61,11 +62,15 @@ jobs:
         path: ${{github.workspace}}/ros_ws/src
         submodules: recursive
 
-    - name: Build Debug
+    - name: Build ${{ matrix.build_type }}
+      shell: bash
       working-directory: ${{github.workspace}}/ros_ws
-      run: /bin/bash -c 'pwd; source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash; colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug --event-handlers console_cohesion+ --cmake-args -DCMAKE_VERBOSE_MAKEFILE=ON'
+      run: |
+          source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash
+          colcon build \
+            --build-base build_${{ matrix.build_type }} \
+            --install-base install_${{ matrix.build_type }} \
+            --event-handlers console_cohesion+ \
+            --cmake-args -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_VERBOSE_MAKEFILE=ON
 
-    - name: Build Release
-      working-directory: ${{github.workspace}}/ros_ws
-      run: /bin/bash -c 'source /opt/ros/${{ matrix.ROS_DISTRO }}/setup.bash; colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release'
 

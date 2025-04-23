@@ -33,6 +33,4 @@
         <!-- Output Calibration State -->
         <remap from="pose_cal_state_out" to="$(var pose_cal_state_out_topic)" />
     </node>
-
 </launch>
-  
