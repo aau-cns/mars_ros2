@@ -19,6 +19,10 @@ find_package(Eigen3 REQUIRED)
 set(mars_lib_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(mars_lib REQUIRED)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(MARS_LIBRARY ${MARS_LIBRARY_RELEASE})
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -26,8 +30,10 @@ elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 
 message("** ROS2 Build **")
+message(" * Build type: ${CMAKE_BUILD_TYPE}")
 message(" * Eigen: ${EIGEN3_INCLUDE_DIR}")
-message(" * Mars:  ${MARS_INCLUDE_DIRS}")
+message(" * Mars Dir:  ${MARS_INCLUDE_DIRS}")
+message(" * Mars Lib: ${MARS_LIBRARY}")
 
 include_directories(
   include
